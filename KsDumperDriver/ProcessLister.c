@@ -91,7 +91,7 @@ NTSTATUS GetProcessList(PVOID listedProcessBuffer, INT32 bufferSize, PINT32 requ
 
 				__try
 				{
-					KeStackAttachProcess(targetProcess, &state);
+					KeStackAttachProcess((struct _KPROCESS*)targetProcess, (PRKAPC_STATE)&state);
 
 					__try
 					{
@@ -126,7 +126,7 @@ NTSTATUS GetProcessList(PVOID listedProcessBuffer, INT32 bufferSize, PINT32 requ
 				}
 				__finally
 				{
-					KeUnstackDetachProcess(&state);
+					KeUnstackDetachProcess((PRKAPC_STATE)&state);
 				}
 
 				if (mainModuleFileName)
@@ -153,4 +153,6 @@ NTSTATUS GetProcessList(PVOID listedProcessBuffer, INT32 bufferSize, PINT32 requ
 		ExFreePool(listHeadPointer);
 		return STATUS_SUCCESS;
 	}
+
+	return STATUS_RETRY;
 }

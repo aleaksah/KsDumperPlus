@@ -10,7 +10,7 @@ UNICODE_STRING deviceName, symLink;
 
 NTSTATUS CopyVirtualMemory(PEPROCESS targetProcess, PVOID sourceAddress, PVOID targetAddress, SIZE_T size)
 {
-	PSIZE_T readBytes;
+	SIZE_T readBytes;
 	return MmCopyVirtualMemory(targetProcess, sourceAddress, PsGetCurrentProcess(), targetAddress, size, UserMode, &readBytes);
 }
 
@@ -28,7 +28,7 @@ NTSTATUS IoControl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 			PKERNEL_COPY_MEMORY_OPERATION request = (PKERNEL_COPY_MEMORY_OPERATION)Irp->AssociatedIrp.SystemBuffer;
 			PEPROCESS targetProcess;
 
-			if (NT_SUCCESS(PsLookupProcessByProcessId(request->targetProcessId, &targetProcess)))
+			if (NT_SUCCESS(PsLookupProcessByProcessId((HANDLE)request->targetProcessId, &targetProcess)))
 			{
 				CopyVirtualMemory(targetProcess, request->targetAddress, request->bufferAddress, request->bufferSize);
 				ObDereferenceObject(targetProcess);
@@ -99,7 +99,7 @@ NTSTATUS CloseDispatch(_In_ PDEVICE_OBJECT DeviceObject, _Inout_ PIRP Irp)
 	return Irp->IoStatus.Status;
 }
 
-NTSTATUS Unload(IN PDRIVER_OBJECT DriverObject)
+void Unload(IN PDRIVER_OBJECT DriverObject)
 {
 	IoDeleteSymbolicLink(&symLink);
 	IoDeleteDevice(DriverObject->DeviceObject);

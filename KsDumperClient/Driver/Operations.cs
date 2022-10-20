@@ -21,7 +21,7 @@ namespace KsDumperClient.Driver
         [StructLayout(LayoutKind.Sequential)]
         public struct KERNEL_COPY_MEMORY_OPERATION
         {
-            public int targetProcessId;
+            public long targetProcessId;
             public ulong targetAddress;
             public ulong bufferAddress;
             public int bufferSize;

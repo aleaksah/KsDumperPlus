@@ -4,7 +4,7 @@
 #pragma pack(push, 1)
 typedef struct _PROCESS_SUMMARY
 {
-	INT32 ProcessId;
+	INT64 ProcessId;
 	PVOID MainModuleBase;
 	WCHAR MainModuleFileName[256];
 	UINT32 MainModuleImageSize;

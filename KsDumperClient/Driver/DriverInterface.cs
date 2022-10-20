@@ -85,7 +85,7 @@ namespace KsDumperClient.Driver
             return 0;
         }
 
-        public bool CopyVirtualMemory(int targetProcessId, IntPtr targetAddress, IntPtr bufferAddress, int bufferSize)
+        public bool CopyVirtualMemory(long targetProcessId, IntPtr targetAddress, IntPtr bufferAddress, int bufferSize)
         {
             if (driverHandle != WinApi.INVALID_HANDLE_VALUE)
             {

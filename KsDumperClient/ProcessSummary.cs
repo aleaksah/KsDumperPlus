@@ -9,7 +9,7 @@ namespace KsDumperClient
 {
     public class ProcessSummary
     {
-        public int ProcessId { get; private set; }
+        public long ProcessId { get; private set; }
         public string ProcessName { get; private set; }
         public ulong MainModuleBase { get; private set; }
         public string MainModuleFileName { get; private set; }
@@ -17,7 +17,7 @@ namespace KsDumperClient
         public ulong MainModuleEntryPoint { get; private set; }
         public bool IsWOW64 { get; private set; }
 
-        private ProcessSummary(int processId, ulong mainModuleBase, string mainModuleFileName, uint mainModuleImageSize, ulong mainModuleEntryPoint, bool isWOW64)
+        private ProcessSummary(long processId, ulong mainModuleBase, string mainModuleFileName, uint mainModuleImageSize, ulong mainModuleEntryPoint, bool isWOW64)
         {
             ProcessId = processId;
             MainModuleBase = mainModuleBase;
@@ -50,7 +50,7 @@ namespace KsDumperClient
         {
             return new ProcessSummary 
             (
-                reader.ReadInt32(),
+                reader.ReadInt64(),
                 reader.ReadUInt64(),
                 Encoding.Unicode.GetString(reader.ReadBytes(512)).Split('\0')[0],
                 reader.ReadUInt32(),

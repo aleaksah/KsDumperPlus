@@ -83,7 +83,7 @@ namespace KsDumperClient
             return false;
         }
 
-        private PEFile Dump64BitPE(int processId, IMAGE_DOS_HEADER dosHeader, byte[] dosStub, IntPtr peHeaderPointer)
+        private PEFile Dump64BitPE(long processId, IMAGE_DOS_HEADER dosHeader, byte[] dosStub, IntPtr peHeaderPointer)
         {
             IMAGE_NT_HEADERS64 peHeader = ReadProcessStruct<IMAGE_NT_HEADERS64>(processId, peHeaderPointer);
 
@@ -94,7 +94,7 @@ namespace KsDumperClient
             return default(PEFile);
         }
 
-        private PEFile Dump32BitPE(int processId, IMAGE_DOS_HEADER dosHeader, byte[] dosStub, IntPtr peHeaderPointer)
+        private PEFile Dump32BitPE(long processId, IMAGE_DOS_HEADER dosHeader, byte[] dosStub, IntPtr peHeaderPointer)
         {
             IMAGE_NT_HEADERS32 peHeader = ReadProcessStruct<IMAGE_NT_HEADERS32>(processId, peHeaderPointer);
 
@@ -105,7 +105,7 @@ namespace KsDumperClient
             return default(PEFile);
         }
 
-        private T ReadProcessStruct<T>(int processId, IntPtr address) where T : struct
+        private T ReadProcessStruct<T>(long processId, IntPtr address) where T : struct
         {
             IntPtr buffer = MarshalUtility.AllocEmptyStruct<T>();
 
@@ -116,7 +116,7 @@ namespace KsDumperClient
             return default(T);
         }
 
-        private bool ReadSectionContent(int processId, IntPtr sectionPointer, PESection section)
+        private bool ReadSectionContent(long processId, IntPtr sectionPointer, PESection section)
         {
             const int maxReadSize = 100;
             int readSize = section.InitialSize;
@@ -146,7 +146,7 @@ namespace KsDumperClient
             return false;
         }
 
-        private byte[] ReadProcessBytes(int processId, IntPtr address, int size)
+        private byte[] ReadProcessBytes(long processId, IntPtr address, int size)
         {
             IntPtr unmanagedBytePointer = MarshalUtility.AllocZeroFilled(size);
             kernelDriver.CopyVirtualMemory(processId, address, unmanagedBytePointer, size);
@@ -158,7 +158,7 @@ namespace KsDumperClient
             return buffer;
         }
 
-        private void CalculateRealSectionSize(int processId, IntPtr sectionPointer, PESection section)
+        private void CalculateRealSectionSize(long processId, IntPtr sectionPointer, PESection section)
         {
             const int maxReadSize = 100;
             int readSize = section.InitialSize;

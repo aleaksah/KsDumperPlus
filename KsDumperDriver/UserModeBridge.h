@@ -14,7 +14,7 @@ typedef struct _KERNEL_PROCESS_LIST_OPERATION
 
 typedef struct _KERNEL_COPY_MEMORY_OPERATION
 {
-	INT32 targetProcessId;
+	INT64 targetProcessId;
 	PVOID targetAddress;
 	PVOID bufferAddress;
 	INT32 bufferSize;
