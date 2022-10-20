@@ -46,6 +46,7 @@
             this.EntryPointHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ImageSizeHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ImageTypeHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.dumpPrivateMemoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
@@ -112,29 +113,30 @@
             // contextMenuStrip1
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.dumpPrivateMemoryToolStripMenuItem,
             this.dumpMainModuleToolStripMenuItem,
             this.toolStripSeparator1,
             this.openInExplorerToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(182, 76);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(195, 98);
             this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
             // 
             // dumpMainModuleToolStripMenuItem
             // 
             this.dumpMainModuleToolStripMenuItem.Name = "dumpMainModuleToolStripMenuItem";
-            this.dumpMainModuleToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.dumpMainModuleToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
             this.dumpMainModuleToolStripMenuItem.Text = "Dump Main Module";
             this.dumpMainModuleToolStripMenuItem.Click += new System.EventHandler(this.dumpMainModuleToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(178, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(191, 6);
             // 
             // openInExplorerToolStripMenuItem
             // 
             this.openInExplorerToolStripMenuItem.Name = "openInExplorerToolStripMenuItem";
-            this.openInExplorerToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.openInExplorerToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
             this.openInExplorerToolStripMenuItem.Text = "Open In Explorer";
             this.openInExplorerToolStripMenuItem.Click += new System.EventHandler(this.openInExplorerToolStripMenuItem_Click);
             // 
@@ -150,10 +152,12 @@
             this.ImageTypeHeader});
             this.processList.ContextMenuStrip = this.contextMenuStrip1;
             this.processList.FullRowSelect = true;
+            this.processList.HideSelection = false;
             this.processList.Location = new System.Drawing.Point(5, 28);
             this.processList.MultiSelect = false;
             this.processList.Name = "processList";
             this.processList.Size = new System.Drawing.Size(992, 491);
+            this.processList.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.processList.TabIndex = 2;
             this.processList.UseCompatibleStateImageBehavior = false;
             this.processList.View = System.Windows.Forms.View.Details;
@@ -192,6 +196,13 @@
             // 
             this.ImageTypeHeader.Text = "Image Type";
             this.ImageTypeHeader.Width = 72;
+            // 
+            // dumpPrivateMemoryToolStripMenuItem
+            // 
+            this.dumpPrivateMemoryToolStripMenuItem.Name = "dumpPrivateMemoryToolStripMenuItem";
+            this.dumpPrivateMemoryToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+            this.dumpPrivateMemoryToolStripMenuItem.Text = "Dump private memory";
+            this.dumpPrivateMemoryToolStripMenuItem.Click += new System.EventHandler(this.dumpPrivateMemoryToolStripMenuItem_Click);
             // 
             // Dumper
             // 
@@ -234,6 +245,6 @@
         private System.Windows.Forms.ToolStripMenuItem dumpMainModuleToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem openInExplorerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem dumpPrivateMemoryToolStripMenuItem;
     }
 }
-

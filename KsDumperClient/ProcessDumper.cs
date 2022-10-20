@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using KsDumperClient.Driver;
 using KsDumperClient.PE;
@@ -81,6 +82,86 @@ namespace KsDumperClient
                 }
             }
             return false;
+        }
+
+        public bool DumpProcessPriveteMem(ProcessSummary processSummary, string out_directory)
+        {
+            IntPtr process_handle = WinApi.OpenProcess(WinApi.PROCESS_QUERY_INFORMATION | WinApi.PROCESS_VM_READ, WinApi.FALSE, (int)processSummary.ProcessId);
+            if (process_handle == null)
+            {
+                return false;
+            }
+
+            // Windows 32bit limit: 0xFFFFFFFF
+            // Windows 64bit limit: 0x7FFFFFFFFFF
+            WinApi.MEMORY_BASIC_INFORMATION m;
+            long MaxAddress = 0x7FFFFFFFFFF;
+            long address = 0;
+
+            while (address < MaxAddress)
+            {
+                int ret;
+                ret = WinApi.VirtualQueryEx(process_handle, (IntPtr)address, out m, (uint)Marshal.SizeOf(typeof(WinApi.MEMORY_BASIC_INFORMATION)));
+                if (ret != (uint)Marshal.SizeOf(typeof(WinApi.MEMORY_BASIC_INFORMATION)))
+                {
+                    return false;
+                }
+
+                if ((m.Type & WinApi.MEM_PRIVATE) != 0)
+                {
+                    long collected = 0;
+                    int maximum_one_time_chunk = 512 * 1024 * 1024;
+                    BinaryWriter Writer = new BinaryWriter(File.OpenWrite(out_directory + "\\" + m.BaseAddress.ToString() + ".bin"));
+
+                    while (collected < (long)m.RegionSize)
+                    {
+                        byte[] mem;
+                        int to_read;
+
+                        if ((long)m.RegionSize - collected > maximum_one_time_chunk)
+                        {
+                            to_read = maximum_one_time_chunk;
+                        }
+                        else
+                        {
+                            to_read = (int)((long)m.RegionSize - collected);
+                        }
+
+                        if (true)
+                        {
+                            mem = ReadProcessBytes(processSummary.ProcessId, (IntPtr)((long)m.BaseAddress + collected), to_read);
+                        }
+                        else
+                        {
+                            mem = new byte[to_read];
+                            int readed = 0;
+
+                            if (WinApi.ReadProcessMemory(process_handle, (IntPtr)((long)m.BaseAddress + collected), mem, (IntPtr)mem.Length, ref readed) == false || readed != to_read)
+                            {
+                                System.Windows.Forms.MessageBox.Show("GLE: " + Marshal.GetLastWin32Error());
+                                Writer.Close();
+                                WinApi.CloseHandle(process_handle);
+                                return false;
+                            }
+
+                        }
+
+                        collected += mem.Length;
+
+                        Writer.Write(mem);
+                        Writer.Flush();
+                    }
+                    Writer.Close();
+
+                    GC.Collect();//eh?
+                }
+
+                address += (long)m.RegionSize;
+            }
+
+            WinApi.CloseHandle(process_handle);
+
+            return true;
         }
 
         private PEFile Dump64BitPE(long processId, IMAGE_DOS_HEADER dosHeader, byte[] dosStub, IntPtr peHeaderPointer)

@@ -27,7 +27,7 @@ namespace KsDumperClient
         private void Dumper_Load(object sender, EventArgs e)
         {
             Logger.OnLog += Logger_OnLog;
-            Logger.Log("KsDumper v1.1 - By EquiFox");
+            Logger.Log("KsDumper v1.1+ - By EquiFox [modded]");
         }
 
         private void LoadProcessList()
@@ -125,6 +125,24 @@ namespace KsDumperClient
         {
             ProcessSummary targetProcess = processList.SelectedItems[0].Tag as ProcessSummary;
             Process.Start("explorer.exe", Path.GetDirectoryName(targetProcess.MainModuleFileName));
+        }
+
+        private void dumpPrivateMemoryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            if (driver.HasValidHandle() && fbd.ShowDialog() == DialogResult.OK)
+            {
+                ProcessSummary targetProcess = processList.SelectedItems[0].Tag as ProcessSummary;
+
+                if (dumper.DumpProcessPriveteMem(targetProcess, fbd.SelectedPath))
+                {
+                    MessageBox.Show("OK", "Memory dumping");
+                }
+                else
+                {
+                    MessageBox.Show("Failed", "Memory dumping");
+                }
+            }
         }
     }
 }

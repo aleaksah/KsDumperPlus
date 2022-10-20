@@ -1,6 +1,7 @@
 #include "NTUndocumented.h"
 #include "ProcessLister.h"
 #include "Utility.h"
+#include <ntstatus.h>
 
 static PSYSTEM_PROCESS_INFORMATION GetRawProcessList()
 {
@@ -13,7 +14,12 @@ static PSYSTEM_PROCESS_INFORMATION GetRawProcessList()
 
 		if (bufferPtr != NULL)
 		{
-			ZwQuerySystemInformation(SystemProcessInformation, bufferPtr, bufferSize, &bufferSize);
+			if (ZwQuerySystemInformation(SystemProcessInformation, bufferPtr, bufferSize, &bufferSize) != STATUS_SUCCESS)
+			{
+				ExFreePool(bufferPtr);
+
+				return (PSYSTEM_PROCESS_INFORMATION)NULL;
+			}
 		}
 	}
 	return (PSYSTEM_PROCESS_INFORMATION)bufferPtr;
@@ -134,7 +140,7 @@ NTSTATUS GetProcessList(PVOID listedProcessBuffer, INT32 bufferSize, PINT32 requ
 					RtlCopyMemory(processSummary->MainModuleFileName, mainModuleFileName, 256 * sizeof(WCHAR));
 					ExFreePool(mainModuleFileName);
 
-					processSummary->ProcessId = rawProcessList->UniqueProcessId;
+					processSummary->ProcessId = (INT64)rawProcessList->UniqueProcessId;
 					processSummary->MainModuleBase = mainModuleBase;
 					processSummary->MainModuleEntryPoint = mainModuleEntryPoint;
 					processSummary->MainModuleImageSize = mainModuleImageSize;

@@ -2,6 +2,7 @@
 #include "ProcessLister.h"
 #include "UserModeBridge.h"
 #include <wdf.h>
+#include <ntddk.h>
 
 DRIVER_INITIALIZE DriverEntry;
 #pragma alloc_text(INIT, DriverEntry)
