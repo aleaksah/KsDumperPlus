@@ -107,53 +107,40 @@ namespace KsDumperClient
                     return false;
                 }
 
-                if ((m.Type & WinApi.MEM_PRIVATE) != 0)
+                bool valid_chunk = true;
+
+                if ((m.Type & WinApi.MEM_PRIVATE) == 0)
                 {
-                    long collected = 0;
-                    int maximum_one_time_chunk = 512 * 1024 * 1024;
-                    BinaryWriter Writer = new BinaryWriter(File.OpenWrite(out_directory + "\\" + m.BaseAddress.ToString() + ".bin"));
+                    //Logger.Log("Skipping, MEM_PRIVATE flag not set");
+                    valid_chunk = false;
+                }
+                else if((m.Protect & WinApi.PAGE_NOACCESS) == WinApi.PAGE_NOACCESS)
+                {
+                    //Logger.Log("Skipping, PAGE_NOACCESS flag set");
+                    valid_chunk = false;
+                }
+                else if((m.State & WinApi.MEM_COMMIT) == 0)
+                {
+                    //Logger.Log("Skipping, MEM_COMMIT flag not set");
+                    valid_chunk = false;
+                }
+                else if((long)m.RegionSize > ((long)1024 * 1024 * 1024 * 2 + 1024 * 1024))
+                {
+                    //Logger.Log("Skipping, chunk too big");
+                    valid_chunk = false;
+                }
 
-                    while (collected < (long)m.RegionSize)
+                if (valid_chunk)
+                {
+                    Logger.Log("Found chunk " + m.BaseAddress + ", size: " + m.RegionSize);
+
+                    string out_file = out_directory + "\\" + m.BaseAddress.ToString() + ".bin";
+                    if (!DumpProcessPriveteRegionToFile(processSummary, m.BaseAddress, (long)m.RegionSize, out_file))
                     {
-                        byte[] mem;
-                        int to_read;
-
-                        if ((long)m.RegionSize - collected > maximum_one_time_chunk)
-                        {
-                            to_read = maximum_one_time_chunk;
-                        }
-                        else
-                        {
-                            to_read = (int)((long)m.RegionSize - collected);
-                        }
-
-                        if (true)
-                        {
-                            mem = ReadProcessBytes(processSummary.ProcessId, (IntPtr)((long)m.BaseAddress + collected), to_read);
-                        }
-                        else
-                        {
-                            mem = new byte[to_read];
-                            int readed = 0;
-
-                            if (WinApi.ReadProcessMemory(process_handle, (IntPtr)((long)m.BaseAddress + collected), mem, (IntPtr)mem.Length, ref readed) == false || readed != to_read)
-                            {
-                                System.Windows.Forms.MessageBox.Show("GLE: " + Marshal.GetLastWin32Error());
-                                Writer.Close();
-                                WinApi.CloseHandle(process_handle);
-                                return false;
-                            }
-
-                        }
-
-                        collected += mem.Length;
-
-                        Writer.Write(mem);
-                        Writer.Flush();
+                        WinApi.CloseHandle(process_handle);
+                        return false;
                     }
-                    Writer.Close();
-
-                    GC.Collect();//eh?
+                    //GC.Collect();//eh?
                 }
 
                 address += (long)m.RegionSize;
@@ -161,6 +148,44 @@ namespace KsDumperClient
 
             WinApi.CloseHandle(process_handle);
 
+            return true;
+        }
+
+        private bool DumpProcessPriveteRegionToFile(ProcessSummary processSummary, IntPtr baseAddr, long length, string filename)
+        {
+            long collected = 0;
+            int maximum_one_time_chunk = 512 * 1024 * 1024;
+            BinaryWriter Writer = new BinaryWriter(File.OpenWrite(filename));
+
+            while (collected < length)
+            {
+                byte[] mem;
+                int to_read;
+
+                if (length - collected > maximum_one_time_chunk)
+                {
+                    to_read = maximum_one_time_chunk;
+                }
+                else
+                {
+                    to_read = (int)(length - collected);
+                }
+
+                mem = ReadProcessBytes(processSummary.ProcessId, (IntPtr)((long)baseAddr + collected), to_read);
+                if (mem.Length != to_read)
+                {
+                    Writer.Close();
+                    return false;
+                }
+
+                collected += mem.Length;
+
+                Logger.Log(collected + "/" + length + " bytes saved");
+
+                Writer.Write(mem);
+                Writer.Flush();
+            }
+            Writer.Close();
             return true;
         }
 

@@ -35,7 +35,7 @@ namespace KsDumperClient
                 return fileName;
             }
 
-            StringBuilder sb = new StringBuilder(256);
+            StringBuilder sb = new StringBuilder(260);
             int length = WinApi.GetLongPathName(fileName, sb, sb.Capacity);
 
             if (length > sb.Capacity)
@@ -52,7 +52,7 @@ namespace KsDumperClient
             (
                 reader.ReadInt64(),
                 reader.ReadUInt64(),
-                Encoding.Unicode.GetString(reader.ReadBytes(512)).Split('\0')[0],
+                Encoding.Unicode.GetString(reader.ReadBytes(260*2)).Split('\0')[0],
                 reader.ReadUInt32(),
                 reader.ReadUInt64(),
                 reader.ReadBoolean()
