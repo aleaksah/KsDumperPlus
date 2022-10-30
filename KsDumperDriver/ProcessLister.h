@@ -132,4 +132,4 @@ typedef struct _PE_HEADER {
 
 NTSTATUS GetProcessList(PVOID listedProcessBuffer, INT32 bufferSize, PINT32 requiredBufferSize, PINT32 processCount);
 
-NTSTATUS GetProcessModulesList(INT64 processId, PVOID listedModulesBuffer, UINT32 bufferSize, PUINT32 bufferSizeOut);
+NTSTATUS GetProcessModulesList(INT64 processId, PVOID listedModulesBuffer, UINT32 bufferSize, PUINT32 bufferSizeOut, PUINT32 modulesCount);

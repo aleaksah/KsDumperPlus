@@ -85,6 +85,31 @@ namespace KsDumperClient.Driver
             return 0;
         }
 
+        private int GetProcessModulesListRequiredBufferSize(long pid)
+        {
+            KERNEL_MODULES_LIST_OPERATION operation = new KERNEL_MODULES_LIST_OPERATION
+            {
+                targetProcessId = pid,
+                targetAddress = (ulong)0,
+                bufferSize = 0
+            };
+
+            IntPtr operationPointer = MarshalUtility.CopyStructToMemory(operation);
+
+            int operationSize = Marshal.SizeOf<KERNEL_MODULES_LIST_OPERATION>();
+
+            if (WinApi.DeviceIoControl(driverHandle, IO_GET_PROCESS_MODULES, operationPointer, operationSize, operationPointer, operationSize, IntPtr.Zero, IntPtr.Zero))
+            {
+                KERNEL_MODULES_LIST_OPERATION operation_result = MarshalUtility.GetStructFromMemory<KERNEL_MODULES_LIST_OPERATION>(operationPointer);
+
+                if (operation_result.bufferSize > 0 && operation_result.bufferSize <= 4*1024*1024)
+                {
+                    return (int)operation_result.bufferSize;
+                }
+            }
+            return 0;
+        }
+
         public bool CopyVirtualMemory(long targetProcessId, IntPtr targetAddress, IntPtr bufferAddress, int bufferSize)
         {
             if (driverHandle != WinApi.INVALID_HANDLE_VALUE)
@@ -105,6 +130,57 @@ namespace KsDumperClient.Driver
                 return result;
             }
             return false;
+        }
+
+        public bool GetProcessModulesList(ProcessSummary targetProcess, out ModuleSummary[] result)
+        {
+            result = new ModuleSummary[0];
+
+            if (driverHandle == WinApi.INVALID_HANDLE_VALUE)
+            {
+                return false;
+            }
+
+            int requiredBufferSize = GetProcessModulesListRequiredBufferSize(targetProcess.ProcessId);
+
+            if (requiredBufferSize <= 0)
+            {
+                return false;
+            }
+
+            IntPtr bufferPointer = MarshalUtility.AllocZeroFilled(requiredBufferSize);
+            KERNEL_MODULES_LIST_OPERATION operation = new KERNEL_MODULES_LIST_OPERATION
+            {
+                targetProcessId = targetProcess.ProcessId,
+                targetAddress = (ulong)bufferPointer.ToInt64(),
+                bufferSize = (uint)requiredBufferSize
+            };
+            IntPtr operationPointer = MarshalUtility.CopyStructToMemory(operation);
+            int operationSize = Marshal.SizeOf<KERNEL_MODULES_LIST_OPERATION>();
+
+            if (!WinApi.DeviceIoControl(driverHandle, IO_GET_PROCESS_MODULES, operationPointer, operationSize, operationPointer, operationSize, IntPtr.Zero, IntPtr.Zero))
+            {
+                Marshal.FreeHGlobal(bufferPointer);
+                return false;
+            }
+
+            operation = MarshalUtility.GetStructFromMemory<KERNEL_MODULES_LIST_OPERATION>(operationPointer);
+
+            byte[] managedBuffer = new byte[requiredBufferSize];
+            Marshal.Copy(bufferPointer, managedBuffer, 0, requiredBufferSize);
+            Marshal.FreeHGlobal(bufferPointer);
+
+            result = new ModuleSummary[(int)operation.modulesCount];//yep, should be fixed...later
+
+            using (BinaryReader reader = new BinaryReader(new MemoryStream(managedBuffer)))
+            {
+                for (int i = 0; i < result.Length; i++)
+                {
+                    result[i] = ModuleSummary.FromStream(reader);
+                }
+            }
+
+            return true;
         }
     }
 }

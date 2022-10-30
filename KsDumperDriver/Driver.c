@@ -69,7 +69,7 @@ NTSTATUS IoControl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
         {
             PKERNEL_MODULES_LIST_OPERATION request = (PKERNEL_MODULES_LIST_OPERATION)Irp->AssociatedIrp.SystemBuffer;
 
-            GetProcessModulesList(request->targetProcessId, request->bufferAddress, request->bufferSize, &request->bufferSize);
+            GetProcessModulesList(request->targetProcessId, request->bufferAddress, request->bufferSize, &request->bufferSize, &request->modulesCount);
 
             status = STATUS_SUCCESS;
             bytesIO = sizeof(KERNEL_MODULES_LIST_OPERATION);

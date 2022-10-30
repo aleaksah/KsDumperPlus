@@ -27,4 +27,5 @@ typedef struct _KERNEL_MODULES_LIST_OPERATION
     INT64 targetProcessId;
     PVOID bufferAddress;
     UINT32 bufferSize;
+    UINT32 modulesCount;
 } KERNEL_MODULES_LIST_OPERATION, * PKERNEL_MODULES_LIST_OPERATION;

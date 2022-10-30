@@ -80,6 +80,7 @@
     <Compile Include="Dumper.Designer.cs">
       <DependentUpon>Dumper.cs</DependentUpon>
     </Compile>
+    <Compile Include="ModuleSummary.cs" />
     <Compile Include="PE\32\PE32File.cs" />
     <Compile Include="PE\32\PE32Header.cs" />
     <Compile Include="PE\DOSHeader.cs" />

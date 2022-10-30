@@ -212,12 +212,12 @@ NTSTATUS GetProcessList(PVOID listedProcessBuffer, INT32 bufferSize, PINT32 requ
     return STATUS_RETRY;
 }
 
-NTSTATUS GetProcessModulesList(INT64 processId, PVOID listedModulesBuffer, UINT32 bufferSize, PUINT32 bufferSizeOut)
+NTSTATUS GetProcessModulesList(INT64 processId, PVOID listedModulesBuffer, UINT32 bufferSize, PUINT32 bufferSizeOut, PUINT32 modulesCount)
 {
     PEPROCESS targetProcess;
     KAPC_STATE state = { 0 };
     UINT32 moduleCount;
-    UINT32 i;
+    UINT32 current_module_number = 0;
     PMODULE_SUMMARY outModuleInfo;
     PVOID buffer;
 
@@ -243,14 +243,15 @@ NTSTATUS GetProcessModulesList(INT64 processId, PVOID listedModulesBuffer, UINT3
 
     if (NT_SUCCESS(PsLookupProcessByProcessId((HANDLE)processId, &targetProcess)))
     {
+        KeStackAttachProcess((struct _KPROCESS*)targetProcess, (PRKAPC_STATE)&state);
+
         buffer = ExAllocatePoolZero(NonPagedPool, moduleCount * sizeof(MODULE_SUMMARY), 'AMLI');
         if (!buffer)
         {
+            KeUnstackDetachProcess((PRKAPC_STATE)&state);
             return STATUS_RETRY;
         }
         outModuleInfo = buffer;
-
-        KeStackAttachProcess((struct _KPROCESS*)targetProcess, (PRKAPC_STATE)&state);
 
         ret = STATUS_SUCCESS;
         PPEB64 peb = (PPEB64)PsGetProcessPeb(targetProcess);
@@ -261,7 +262,7 @@ NTSTATUS GetProcessModulesList(INT64 processId, PVOID listedModulesBuffer, UINT3
 
             first = peb->Ldr->InLoadOrderModuleList.Flink;
             current = first;
-            for(i=0; i< moduleCount; ++i)
+            for(current_module_number=0; current_module_number< moduleCount; ++current_module_number)
             {
                 PLDR_DATA_TABLE_ENTRY mod_entry;
 
@@ -272,8 +273,16 @@ NTSTATUS GetProcessModulesList(INT64 processId, PVOID listedModulesBuffer, UINT3
                     break;
                 }
 
-                RtlCopyMemory(outModuleInfo->FullDllName, mod_entry->FullDllName.Buffer, min(LOCAL_PATH_MAX * sizeof(WCHAR), mod_entry->FullDllName.Length));
-                RtlCopyMemory(outModuleInfo->BaseDllName, mod_entry->BaseDllName.Buffer, min(LOCAL_PATH_MAX * sizeof(WCHAR), mod_entry->BaseDllName.Length));
+                if (mod_entry->FullDllName.Length > 1 && SanitizeUserPointer(mod_entry->FullDllName.Buffer, mod_entry->FullDllName.Length))
+                {
+                    RtlCopyMemory(outModuleInfo->FullDllName, mod_entry->FullDllName.Buffer, min(LOCAL_PATH_MAX * sizeof(WCHAR), mod_entry->FullDllName.Length));
+                }
+
+                if (mod_entry->BaseDllName.Length > 1 && SanitizeUserPointer(mod_entry->BaseDllName.Buffer, mod_entry->BaseDllName.Length))
+                {
+                    RtlCopyMemory(outModuleInfo->BaseDllName, mod_entry->BaseDllName.Buffer, min(LOCAL_PATH_MAX * sizeof(WCHAR), mod_entry->BaseDllName.Length));
+                }
+
                 outModuleInfo->DllBase = mod_entry->DllBase;
                 outModuleInfo->SizeOfImage = mod_entry->SizeOfImage;
 
@@ -290,6 +299,7 @@ NTSTATUS GetProcessModulesList(INT64 processId, PVOID listedModulesBuffer, UINT3
         }
         KeUnstackDetachProcess((PRKAPC_STATE)&state);
 
+        *modulesCount = current_module_number;
         RtlCopyMemory(listedModulesBuffer, buffer, moduleCount * sizeof(MODULE_SUMMARY));
         ExFreePool(buffer);
     }

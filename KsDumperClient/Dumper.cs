@@ -144,5 +144,24 @@ namespace KsDumperClient
                 }
             }
         }
+
+        private void showModulesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string report = "";
+            ProcessSummary targetProcess = processList.SelectedItems[0].Tag as ProcessSummary;
+            if (driver.GetProcessModulesList(targetProcess, out ModuleSummary[] result))
+            {
+                //beautiful window needs to be created...later
+                foreach (ModuleSummary module in result)
+                {
+                    report += module.DllBase.ToString() + " ";
+                    report += module.SizeOfImage.ToString() + " ";
+                    report += module.FullDllName + " ";
+                    report += module.BaseDllName + "\n";
+                }
+
+                MessageBox.Show(report);
+            }
+        }
     }
 }

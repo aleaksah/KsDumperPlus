@@ -35,6 +35,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.logsTextBox = new System.Windows.Forms.RichTextBox();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.dumpPrivateMemoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dumpMainModuleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.openInExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,7 +47,7 @@
             this.EntryPointHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ImageSizeHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ImageTypeHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.dumpPrivateMemoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showModulesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
@@ -114,12 +115,20 @@
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.dumpPrivateMemoryToolStripMenuItem,
+            this.showModulesToolStripMenuItem,
             this.dumpMainModuleToolStripMenuItem,
             this.toolStripSeparator1,
             this.openInExplorerToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(195, 98);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(195, 120);
             this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
+            // 
+            // dumpPrivateMemoryToolStripMenuItem
+            // 
+            this.dumpPrivateMemoryToolStripMenuItem.Name = "dumpPrivateMemoryToolStripMenuItem";
+            this.dumpPrivateMemoryToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+            this.dumpPrivateMemoryToolStripMenuItem.Text = "Dump private memory";
+            this.dumpPrivateMemoryToolStripMenuItem.Click += new System.EventHandler(this.dumpPrivateMemoryToolStripMenuItem_Click);
             // 
             // dumpMainModuleToolStripMenuItem
             // 
@@ -197,12 +206,12 @@
             this.ImageTypeHeader.Text = "Image Type";
             this.ImageTypeHeader.Width = 72;
             // 
-            // dumpPrivateMemoryToolStripMenuItem
+            // showModulesToolStripMenuItem
             // 
-            this.dumpPrivateMemoryToolStripMenuItem.Name = "dumpPrivateMemoryToolStripMenuItem";
-            this.dumpPrivateMemoryToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
-            this.dumpPrivateMemoryToolStripMenuItem.Text = "Dump private memory";
-            this.dumpPrivateMemoryToolStripMenuItem.Click += new System.EventHandler(this.dumpPrivateMemoryToolStripMenuItem_Click);
+            this.showModulesToolStripMenuItem.Name = "showModulesToolStripMenuItem";
+            this.showModulesToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+            this.showModulesToolStripMenuItem.Text = "Show modules";
+            this.showModulesToolStripMenuItem.Click += new System.EventHandler(this.showModulesToolStripMenuItem_Click);
             // 
             // Dumper
             // 
@@ -246,5 +255,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem openInExplorerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem dumpPrivateMemoryToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem showModulesToolStripMenuItem;
     }
 }
