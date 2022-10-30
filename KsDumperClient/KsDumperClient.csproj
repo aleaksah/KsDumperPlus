@@ -80,6 +80,12 @@
     <Compile Include="Dumper.Designer.cs">
       <DependentUpon>Dumper.cs</DependentUpon>
     </Compile>
+    <Compile Include="ModulesList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ModulesList.Designer.cs">
+      <DependentUpon>ModulesList.cs</DependentUpon>
+    </Compile>
     <Compile Include="ModuleSummary.cs" />
     <Compile Include="PE\32\PE32File.cs" />
     <Compile Include="PE\32\PE32Header.cs" />
@@ -101,6 +107,9 @@
     </Compile>
     <EmbeddedResource Include="Dumper.resx">
       <DependentUpon>Dumper.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ModulesList.resx">
+      <DependentUpon>ModulesList.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

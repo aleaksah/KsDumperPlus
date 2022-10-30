@@ -170,7 +170,7 @@ namespace KsDumperClient.Driver
             Marshal.Copy(bufferPointer, managedBuffer, 0, requiredBufferSize);
             Marshal.FreeHGlobal(bufferPointer);
 
-            result = new ModuleSummary[(int)operation.modulesCount];//yep, should be fixed...later
+            result = new ModuleSummary[(int)operation.modulesCount];
 
             using (BinaryReader reader = new BinaryReader(new MemoryStream(managedBuffer)))
             {

@@ -27,7 +27,7 @@ namespace KsDumperClient
         private void Dumper_Load(object sender, EventArgs e)
         {
             Logger.OnLog += Logger_OnLog;
-            Logger.Log("KsDumper v1.1+ - By EquiFox [modded]");
+            Logger.Log("KsDumper v1.1+ - By EquiFox [modded by aleaksah]");
         }
 
         private void LoadProcessList()
@@ -147,20 +147,11 @@ namespace KsDumperClient
 
         private void showModulesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string report = "";
             ProcessSummary targetProcess = processList.SelectedItems[0].Tag as ProcessSummary;
             if (driver.GetProcessModulesList(targetProcess, out ModuleSummary[] result))
             {
-                //beautiful window needs to be created...later
-                foreach (ModuleSummary module in result)
-                {
-                    report += module.DllBase.ToString() + " ";
-                    report += module.SizeOfImage.ToString() + " ";
-                    report += module.FullDllName + " ";
-                    report += module.BaseDllName + "\n";
-                }
-
-                MessageBox.Show(report);
+                ModulesList user_report = new ModulesList(targetProcess.ProcessName, result);
+                user_report.Show();
             }
         }
     }
